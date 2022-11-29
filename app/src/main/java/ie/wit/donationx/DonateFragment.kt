@@ -5,6 +5,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import ie.wit.donationx.databinding.FragmentDonateBinding
+import ie.wit.donationx.main.DonationXApp
+import ie.wit.donationx.models.DonationModel
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -17,43 +21,71 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class DonateFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    lateinit var app: DonationXApp
+    var totalDonated = 0
+    private var _fragBinding: FragmentDonateBinding? = null
+    private val fragBinding get() = _fragBinding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+        app = activity?.application as DonationXApp
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_donate, container, false)
+
+        _fragBinding = FragmentDonateBinding.inflate(inflater, container, false)
+        val root = fragBinding.root
+        activity?.title = getString(R.string.action_donate)
+
+        fragBinding.progressBar.max = 10000
+        fragBinding.amountPicker.minValue = 1
+        fragBinding.amountPicker.maxValue = 1000
+
+        fragBinding.amountPicker.setOnValueChangedListener { _, _, newVal ->
+            //Display the newly selected number to paymentAmount
+            fragBinding.paymentAmount.setText("$newVal")
+        }
+        setButtonListener(fragBinding)
+        return root;
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _fragBinding = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        totalDonated = app.donationsStore.findAll().sumOf { it.amount }
+        fragBinding.progressBar.progress = totalDonated
+        fragBinding.totalSoFar.text = getString(R.string.totalSoFar,totalDonated)
+    }
+
+    fun setButtonListener(layout: FragmentDonateBinding) {
+        layout.donateButton.setOnClickListener {
+            val amount = if (layout.paymentAmount.text.isNotEmpty())
+                layout.paymentAmount.text.toString().toInt() else layout.amountPicker.value
+            if(totalDonated >= layout.progressBar.max)
+                Toast.makeText(context,"Donate Amount Exceeded!",Toast.LENGTH_LONG).show()
+            else {
+                val paymentmethod = if(layout.paymentMethod.checkedRadioButtonId == R.id.Direct) "Direct" else "Paypal"
+                totalDonated += amount
+                layout.totalSoFar.text = getString(R.string.totalSoFar,totalDonated)
+                layout.progressBar.progress = totalDonated
+                app.donationsStore.create(DonationModel(paymentmethod = paymentmethod,amount = amount))
+            }
+        }
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment DonateFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance() =
             DonateFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+                arguments = Bundle().apply {}
             }
     }
 }
