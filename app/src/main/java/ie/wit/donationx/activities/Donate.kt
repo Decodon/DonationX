@@ -15,6 +15,8 @@ import timber.log.Timber
 class Donate : AppCompatActivity() {
 
     private lateinit var donateLayout : ActivityDonateBinding
+    lateinit var app: DonationXApp
+    var totalDonated = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,10 +33,7 @@ class Donate : AppCompatActivity() {
             donateLayout.paymentAmount.setText("$newVal")
         }
 
-        lateinit var app: DonationXApp
         app = this.application as DonationXApp
-
-        var totalDonated = 0
 
         donateLayout.donateButton.setOnClickListener {
             val amount = if (donateLayout.paymentAmount.text.isNotEmpty())
@@ -69,6 +68,13 @@ class Donate : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        totalDonated = app.donationsStore.findAll().sumOf { it.amount }
+        donateLayout.progressBar.progress = totalDonated
+        donateLayout.totalSoFar.text = getString(R.string.totalSoFar,totalDonated)
     }
 
 
