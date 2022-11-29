@@ -1,11 +1,11 @@
 package ie.wit.donationx
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
+import androidx.navigation.findNavController
+import androidx.navigation.ui.NavigationUI
 import ie.wit.donationx.databinding.FragmentDonateBinding
 import ie.wit.donationx.main.DonationXApp
 import ie.wit.donationx.models.DonationModel
@@ -30,6 +30,7 @@ class DonateFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         app = activity?.application as DonationXApp
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
@@ -79,6 +80,16 @@ class DonateFragment : Fragment() {
                 app.donationsStore.create(DonationModel(paymentmethod = paymentmethod,amount = amount))
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_donate, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return NavigationUI.onNavDestinationSelected(item,
+            requireView().findNavController()) || super.onOptionsItemSelected(item)
     }
 
     companion object {
