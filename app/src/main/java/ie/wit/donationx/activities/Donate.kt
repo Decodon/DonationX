@@ -1,9 +1,12 @@
-package ie.wit.donationx
+package ie.wit.donationx.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import ie.wit.donationx.R
 import ie.wit.donationx.databinding.ActivityDonateBinding
+import ie.wit.donationx.main.DonationXApp
+import ie.wit.donationx.models.DonationModel
 import timber.log.Timber
 
 class Donate : AppCompatActivity() {
@@ -25,20 +28,25 @@ class Donate : AppCompatActivity() {
             donateLayout.paymentAmount.setText("$newVal")
         }
 
+        lateinit var app: DonationXApp
+        app = this.application as DonationXApp
+
         var totalDonated = 0
 
         donateLayout.donateButton.setOnClickListener {
             val amount = if (donateLayout.paymentAmount.text.isNotEmpty())
                 donateLayout.paymentAmount.text.toString().toInt() else donateLayout.amountPicker.value
             if(totalDonated >= donateLayout.progressBar.max)
-                Toast.makeText(applicationContext,"Donate Amount Exceeded!",Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext,"Donate Amount Exceeded!", Toast.LENGTH_LONG).show()
             else {
+                val paymentmethod = if(donateLayout.paymentMethod.checkedRadioButtonId == R.id.Direct)
+                    "Direct" else "Paypal"
                 totalDonated += amount
                 donateLayout.totalSoFar.text = getString(R.string.totalSoFar,totalDonated)
                 donateLayout.progressBar.progress = totalDonated
+                app.donationsStore.create(DonationModel(paymentmethod = paymentmethod,amount = amount))
                 Timber.i("Total Donated so far $totalDonated")
             }
         }
-
     }
 }
