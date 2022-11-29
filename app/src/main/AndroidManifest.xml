@@ -14,6 +14,13 @@
         android:theme="@style/Theme.DonationX"
         tools:targetApi="31">
         <activity
+            android:name=".activities.Report"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".activities.Donate"
             android:exported="true">
             <intent-filter>
