@@ -13,6 +13,7 @@ class Home : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var homeBinding : HomeBinding
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,12 +27,16 @@ class Home : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         val navController = findNavController(R.id.nav_host_fragment)
-        NavigationUI.setupActionBarWithNavController(this, navController, drawerLayout)
+
+
+        appBarConfiguration = AppBarConfiguration(setOf(
+            R.id.donateFragment, R.id.reportFragment), drawerLayout)
+        setupActionBarWithNavController(navController, appBarConfiguration)
 
     }
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
-        return NavigationUI.navigateUp(navController, drawerLayout)
+        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 }
