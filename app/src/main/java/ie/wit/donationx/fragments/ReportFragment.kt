@@ -1,4 +1,4 @@
-package ie.wit.donationx
+package ie.wit.donationx.fragments
 
 import android.os.Bundle
 import android.view.*
@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.LinearLayoutManager
+import ie.wit.donationx.R
 import ie.wit.donationx.adapters.DonationAdapter
 import ie.wit.donationx.databinding.FragmentReportBinding
 import ie.wit.donationx.main.DonationXApp
